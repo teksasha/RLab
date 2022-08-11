@@ -1,0 +1,121 @@
+---
+title: "Lab 9"
+author: "Sasha Tekeian"
+date: "4/23/2019"
+output: html_document
+---
+```{r, echo = FALSE}
+download.file("http://www.openintro.org/stat/data/mlb11.RData", destfile = "mlb11.RData")
+load("mlb11.RData")
+m1 <- lm(runs ~ at_bats, data = mlb11)
+m2 <- lm(runs ~ homeruns, data = mlb11)
+```
+<b>Exercise 1: </b>
+What type of plot would you use to display the relationship between runs and one of the other numerical variables? Does the relationship look linear? If you knew a team’s at_bats, would you be comfortable using a linear model to predict the number of runs?
+<br>
+I would use a scatter plot to display this relationship.
+```{r, echo = FALSE}
+plot(mlb11$at_bats, mlb11$runs)
+cor(mlb11$runs, mlb11$at_bats)
+```
+<br>
+The relationship is only very vaguely linear.  I would not be comfortable using a linear model to predict number of runs from at bats.
+
+<b>Exercise 2: </b>
+Looking at your plot from the previous exercise, describe the relationship between these two variables. Make sure to discuss the form, direction, and strength of the relationship as well as any unusual observations.
+<br>
+The data has a general positive trend, but it is pretty evenly distributed and does not strongly trend toward any one line or area.
+
+<b>Exercise 3: </b>
+Using plot_ss, choose a line that does a good job of minimizing the sum of squares. Run the function several times. What was the smallest sum of squares that you got? How does it compare to your neighbors?
+<br>
+The smallest sum of squares I got was 131610.8, which is pretty similar to my neighbors' values.
+
+<b>Exercise 4: </b>
+Fit a new model that uses homeruns to predict runs. Using the estimates from the R output, write the equation of the regression line. What does the slope tell us in the context of the relationship between success of a team and its home runs?
+<br>
+$$ \hat{y} = 415.2389 + 1.8345 * homeruns$$
+
+<b>Exercise 5: </b>
+If a team manager saw the least squares regression line and not the actual data, how many runs would he or she predict for a team with 5,578 at-bats? Is this an overestimate or an underestimate, and by how much? In other words, what is the residual for this prediction?
+<br>
+
+<b>Exercise 6: </b>
+Is there any apparent pattern in the residuals plot? What does this indicate about the linearity of the relationship between runs and at-bats?
+<br>
+The distribution of this plot appears to be pretty uniform and the relationship is linear.
+
+<b>Exercise 7: </b>
+Based on the histogram and the normal probability plot, does the nearly normal residuals condition appear to be met?
+<br>
+```{r, echo = FALSE}
+hist(m1$residuals)
+qqnorm(m1$residuals)
+qqline(m1$residuals)
+```
+<br>
+Based on the graphs, the condition appears to be met.
+
+<b>Exercise 8: </b>
+Based on the plot in (1), does the constant variability condition appear to be met?
+<br>
+Based on the plot, the constant variability condition appears to be met.
+
+<hr>
+1. Choose another traditional variable from mlb11 that you think might be a good predictor of runs. Produce a scatterplot of the two variables and fit a linear model. At a glance, does there seem to be a linear relationship?
+<br>
+```{r, echo = FALSE}
+m3 <- lm(runs ~ bat_avg, data = mlb11)
+plot(mlb11$runs ~ mlb11$bat_avg)
+abline(m3)
+```
+<br>
+The variable I chose is batting average.  At a glance, there seems to be a fairly strong linear relationship between these variables.
+
+2. How does this relationship compare to the relationship between runs and at_bats? Use the R2 values from the two model summaries to compare. Does your variable seem to predict runs better than at_bats? How can you tell?
+<br>
+```{r, echo = FALSE}
+summary(m1)
+summary(m3)
+```
+Based on just the R^2^ values, `bat_avg` does seem to predict runs better than `at_bats`, since the R^2^ for bat_avg is 0.6561 and the R^2^ for `at_bats` is just 0.3729.  
+
+3. Now that you can summarize the linear relationship between two variables, investigate the relationships between runs and each of the other five traditional variables. Which variable best predicts runs? Support your conclusion using the graphical and numerical methods we’ve discussed (for the sake of conciseness, only include output for the best variable, not all five).
+<br>
+```{r, echo = FALSE}
+plot(mlb11$runs ~ mlb11$bat_avg)
+abline(m3)
+summary(m3)
+```
+<br>
+The variable that best predicts runs is batting average (`bat_avg`).  Visually, several of the variables have very close correlations, but `bat_avg` has the highest R^2^ value, so it is the best predictor.
+
+4. Now examine the three newer variables. These are the statistics used by the author of Moneyball to predict a team's success. In general, are they more or less effective at predicting runs than the old variables? Explain using appropriate graphical and numerical evidence. Of all ten variables we’ve analyzed, which seems to be the best predictor of runs? Using the limited (or not so limited) information you know about these baseball statistics, does your result make sense?
+<br>
+```{r, echo = FALSE}
+m8 <- lm(runs ~ new_onbase, data = mlb11)
+m9 <- lm(runs ~ new_slug, data = mlb11)
+m10 <- lm(runs ~ new_obs, data = mlb11)
+plot(mlb11$runs ~ mlb11$new_onbase)
+abline(m8)
+summary(m8)
+plot(mlb11$runs ~ mlb11$new_slug)
+abline(m9)
+summary(m9)
+plot(mlb11$runs ~ mlb11$new_obs)
+abline(m10)
+summary(m10)
+```
+In general, the new variables are significantly more effective at predicting runs than the old variables.  The scatterplots for all three new variables are have visually stronger correlations and the R^2^ values are all significantly higher than the old variables.  Out of the new variables, the most effective is on-base plus slugging (`new_obs`) with an R^2^ value of 0.9349.
+
+5. Check the model diagnostics for the regression model with the variable you decided was the best predictor for runs.
+<br>
+```{r, echo=FALSE}
+plot(m10$residuals ~ mlb11$new_obs)
+abline(h = 0, lty = 3)
+hist(m10$residuals)
+```
+
+Linearity: The residuals appear to have no pattern and are scattered across the graph.
+Nearly normal residuals: The histogram is slightly skewed, but very close to normal.
+Constant variability:
